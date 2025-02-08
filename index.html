@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otomatik Borsa Takip</title>
+    <title>MiningPoolStats Kripto Verileri</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,10 +32,6 @@
             background-color: #6200ea;
             color: white;
         }
-        .chart-container {
-            width: 80%;
-            margin: 20px auto;
-        }
         footer {
             background-color: #333;
             color: white;
@@ -46,105 +42,74 @@
             width: 100%;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header>
-        <h1>Otomatik Borsa Takip</h1>
+        <h1>MiningPoolStats Kripto Verileri</h1>
     </header>
 
     <table>
         <thead>
             <tr>
-                <th>Hisse/Endeks</th>
-                <th>Fiyat</th>
-                <th>Değişim</th>
+                <th>Kripto Para</th>
+                <th>Fiyat (USD)</th>
+                <th>Hashrate</th>
+                <th>Madencilik Havuzu</th>
             </tr>
         </thead>
-        <tbody id="stockTable">
-            <!-- Hisse verileri buraya eklenecek -->
+        <tbody id="dataTable">
+            <!-- Veriler buraya eklenecek -->
         </tbody>
     </table>
 
-    <div class="chart-container">
-        <canvas id="priceChart"></canvas>
-    </div>
-
     <footer>
-        <p>© 2023 Otomatik Borsa Takip. Tüm hakları saklıdır.</p>
+        <p>© 2023 MiningPoolStats Verileri. Tüm hakları saklıdır.</p>
     </footer>
 
     <script>
-        // Alpha Vantage API Anahtarı
-        const alphaVantageApiKey = 'EZEFV423V0JHADA2'; // Kendi API anahtarınızı ekleyin
+        // MiningPoolStats.stream'den veri çekme
+        async function fetchMiningPoolStatsData() {
+            try {
+                const url = "https://miningpoolstats.stream/";
+                const response = await fetch(url);
+                const text = await response.text();
 
-        // Hisse senetleri ve sembolleri
-        const stocks = [
-            { name: "BIST 100", symbol: "XU100.IST" },
-            { name: "S&P 500", symbol: "SPX" },
-            { name: "NASDAQ", symbol: "IXIC" },
-        ];
+                // HTML'yi parse etmek için bir sanal DOM oluştur
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(text, "text/html");
 
-        // Kripto paralar
-        const cryptos = [
-            { name: "Bitcoin", symbol: "bitcoin" },
-            { name: "Ethereum", symbol: "ethereum" },
-        ];
+                // Verileri çekmek için gerekli selector'lar
+                const rows = doc.querySelectorAll("table tbody tr");
 
-        // Tabloya veri ekleme
-        const tableBody = document.getElementById("stockTable");
+                let tableContent = '';
 
-        // Alpha Vantage API'sinden hisse verilerini çekme
-        async function fetchStockData(symbol) {
-            const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${alphaVantageApiKey}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data['Global Quote'];
-        }
+                rows.forEach(row => {
+                    const columns = row.querySelectorAll("td");
+                    if (columns.length >= 4) {
+                        const cryptoName = columns[0].textContent.trim();
+                        const price = columns[1].textContent.trim();
+                        const hashrate = columns[2].textContent.trim();
+                        const pool = columns[3].textContent.trim();
 
-        // CoinGecko API'sinden kripto verilerini çekme
-        async function fetchCryptoData(symbol) {
-            const url = `https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd&include_24hr_change=true`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data[symbol];
-        }
+                        tableContent += `<tr>
+                                            <td>${cryptoName}</td>
+                                            <td>${price}</td>
+                                            <td>${hashrate}</td>
+                                            <td>${pool}</td>
+                                         </tr>`;
+                    }
+                });
 
-        // Tüm verileri güncelleme
-        async function updateData() {
-            let tableContent = '';
-
-            // Hisse senetleri
-            for (const stock of stocks) {
-                const data = await fetchStockData(stock.symbol);
-                const price = data['05. price'];
-                const change = data['10. change percent'];
-                tableContent += `<tr>
-                                    <td>${stock.name}</td>
-                                    <td>${price}</td>
-                                    <td>${change}</td>
-                                 </tr>`;
+                // Tabloyu güncelle
+                document.getElementById("dataTable").innerHTML = tableContent;
+            } catch (error) {
+                console.error("Veri çekme hatası:", error);
             }
-
-            // Kripto paralar
-            for (const crypto of cryptos) {
-                const data = await fetchCryptoData(crypto.symbol);
-                const price = data.usd;
-                const change = data.usd_24h_change.toFixed(2);
-                tableContent += `<tr>
-                                    <td>${crypto.name}</td>
-                                    <td>${price}</td>
-                                    <td>${change}%</td>
-                                 </tr>`;
-            }
-
-            // Tabloyu güncelle
-            tableBody.innerHTML = tableContent;
         }
 
         // Sayfa yüklendiğinde ve her 5 dakikada bir verileri güncelle
-        updateData();
-        setInterval(updateData, 300000); // 5 dakikada bir güncelle
+        fetchMiningPoolStatsData();
+        setInterval(fetchMiningPoolStatsData, 300000); // 5 dakikada bir güncelle
     </script>
 </body>
 </html>
