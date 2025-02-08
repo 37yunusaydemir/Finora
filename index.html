@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiningPoolStats Kripto Verileri</title>
+    <title>Finora - Kripto Madencilik Verileri</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,7 +45,7 @@
 </head>
 <body>
     <header>
-        <h1>MiningPoolStats Kripto Verileri</h1>
+        <h1>Finora - Kripto Madencilik Verileri</h1>
     </header>
 
     <table>
@@ -63,7 +63,7 @@
     </table>
 
     <footer>
-        <p>© 2023 MiningPoolStats Verileri. Tüm hakları saklıdır.</p>
+        <p>© 2023 Finora. Tüm hakları saklıdır.</p>
     </footer>
 
     <script>
@@ -107,6 +107,7 @@
                 document.getElementById("dataTable").innerHTML = tableContent;
             } catch (error) {
                 console.error("Veri çekme hatası:", error);
+                document.getElementById("dataTable").innerHTML = `<tr><td colspan="4">Veriler yüklenirken bir hata oluştu.</td></tr>`;
             }
         }
 
