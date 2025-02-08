@@ -67,33 +67,39 @@
     </footer>
 
     <script>
-        // Örnek veriler (MiningPoolStats.stream'den veri çekemiyorsak, örnek verilerle gösterim yapalım)
-        const sampleData = [
-            { crypto: "Bitcoin", price: "$29,000", hashrate: "150 EH/s", pool: "Pool 1" },
-            { crypto: "Ethereum", price: "$1,800", hashrate: "900 TH/s", pool: "Pool 2" },
-            { crypto: "Litecoin", price: "$90", hashrate: "500 TH/s", pool: "Pool 3" },
-            { crypto: "Monero", price: "$160", hashrate: "2 GH/s", pool: "Pool 4" },
-        ];
+        // API URL'si (MiningPoolStats.stream'in kullandığı API)
+        const apiUrl = "https://data.miningpoolstats.stream/data/coins_data.js?t=1739049075";
 
-        // Tabloya veri ekleme fonksiyonu
-        function renderTable(data) {
-            const tableBody = document.getElementById("dataTable");
-            let tableContent = '';
+        // Verileri çekme ve tabloya ekleme fonksiyonu
+        async function fetchData() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json(); // API'dan gelen verileri JSON olarak al
 
-            data.forEach(item => {
-                tableContent += `<tr>
-                                    <td>${item.crypto}</td>
-                                    <td>${item.price}</td>
-                                    <td>${item.hashrate}</td>
-                                    <td>${item.pool}</td>
-                                 </tr>`;
-            });
+                const tableBody = document.getElementById("dataTable");
+                let tableContent = '';
 
-            tableBody.innerHTML = tableContent;
+                // Verileri işle ve tabloya ekle
+                data.forEach(item => {
+                    tableContent += `<tr>
+                                        <td>${item.name}</td>
+                                        <td>${item.price}</td>
+                                        <td>${item.hashrate}</td>
+                                        <td>${item.pool}</td>
+                                     </tr>`;
+                });
+
+                // Tabloyu güncelle
+                tableBody.innerHTML = tableContent;
+            } catch (error) {
+                console.error("Veri çekme hatası:", error);
+                document.getElementById("dataTable").innerHTML = `<tr><td colspan="4">Veriler yüklenirken bir hata oluştu.</td></tr>`;
+            }
         }
 
-        // Sayfa yüklendiğinde örnek verileri göster
-        renderTable(sampleData);
+        // Sayfa yüklendiğinde ve her 5 dakikada bir verileri güncelle
+        fetchData();
+        setInterval(fetchData, 300000); // 5 dakikada bir güncelle
     </script>
 </body>
 </html>
