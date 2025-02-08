@@ -58,7 +58,7 @@
             </tr>
         </thead>
         <tbody id="dataTable">
-            <!-- Veriler buraya eklenecek -->
+            <!-- Veriler buraya dinamik olarak eklenecek -->
         </tbody>
     </table>
 
@@ -67,53 +67,33 @@
     </footer>
 
     <script>
-        // CORS Proxy URL'si (örnek olarak CORS Anywhere kullanıyoruz)
-        const corsProxy = "https://cors-anywhere.herokuapp.com/";
-        const targetUrl = "https://miningpoolstats.stream/";
+        // Örnek veriler (MiningPoolStats.stream'den veri çekemiyorsak, örnek verilerle gösterim yapalım)
+        const sampleData = [
+            { crypto: "Bitcoin", price: "$29,000", hashrate: "150 EH/s", pool: "Pool 1" },
+            { crypto: "Ethereum", price: "$1,800", hashrate: "900 TH/s", pool: "Pool 2" },
+            { crypto: "Litecoin", price: "$90", hashrate: "500 TH/s", pool: "Pool 3" },
+            { crypto: "Monero", price: "$160", hashrate: "2 GH/s", pool: "Pool 4" },
+        ];
 
-        // MiningPoolStats.stream'den veri çekme
-        async function fetchMiningPoolStatsData() {
-            try {
-                const response = await fetch(corsProxy + targetUrl);
-                const text = await response.text();
+        // Tabloya veri ekleme fonksiyonu
+        function renderTable(data) {
+            const tableBody = document.getElementById("dataTable");
+            let tableContent = '';
 
-                // HTML'yi parse etmek için bir sanal DOM oluştur
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, "text/html");
+            data.forEach(item => {
+                tableContent += `<tr>
+                                    <td>${item.crypto}</td>
+                                    <td>${item.price}</td>
+                                    <td>${item.hashrate}</td>
+                                    <td>${item.pool}</td>
+                                 </tr>`;
+            });
 
-                // Verileri çekmek için gerekli selector'lar
-                const rows = doc.querySelectorAll("table tbody tr");
-
-                let tableContent = '';
-
-                rows.forEach(row => {
-                    const columns = row.querySelectorAll("td");
-                    if (columns.length >= 4) {
-                        const cryptoName = columns[0].textContent.trim();
-                        const price = columns[1].textContent.trim();
-                        const hashrate = columns[2].textContent.trim();
-                        const pool = columns[3].textContent.trim();
-
-                        tableContent += `<tr>
-                                            <td>${cryptoName}</td>
-                                            <td>${price}</td>
-                                            <td>${hashrate}</td>
-                                            <td>${pool}</td>
-                                         </tr>`;
-                    }
-                });
-
-                // Tabloyu güncelle
-                document.getElementById("dataTable").innerHTML = tableContent;
-            } catch (error) {
-                console.error("Veri çekme hatası:", error);
-                document.getElementById("dataTable").innerHTML = `<tr><td colspan="4">Veriler yüklenirken bir hata oluştu.</td></tr>`;
-            }
+            tableBody.innerHTML = tableContent;
         }
 
-        // Sayfa yüklendiğinde ve her 5 dakikada bir verileri güncelle
-        fetchMiningPoolStatsData();
-        setInterval(fetchMiningPoolStatsData, 300000); // 5 dakikada bir güncelle
+        // Sayfa yüklendiğinde örnek verileri göster
+        renderTable(sampleData);
     </script>
 </body>
 </html>
