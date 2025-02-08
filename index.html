@@ -22,15 +22,15 @@
             width: 100%;
             height: 80vh;
             border: none;
+            overflow: hidden;
         }
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+        /* Iframe'in belirli kısımlarını gizle */
+        iframe body * {
+            display: none !important;
+        }
+        iframe body .col-sm-12 {
+            display: block !important;
+            visibility: visible !important;
         }
     </style>
 </head>
@@ -44,23 +44,5 @@
     <footer>
         <p>© 2023 Finora. Tüm hakları saklıdır.</p>
     </footer>
-
-    <script>
-        // Iframe yüklendiğinde çalışacak fonksiyon
-        document.getElementById('miningIframe').onload = function() {
-            const iframe = document.getElementById('miningIframe');
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-
-            // Iframe içeriğini manipüle et
-            const header = iframeDocument.querySelector('header');
-            const footer = iframeDocument.querySelector('footer');
-            const sidebar = iframeDocument.querySelector('.sidebar');
-
-            // İstenmeyen kısımları gizle
-            if (header) header.style.display = 'none';
-            if (footer) footer.style.display = 'none';
-            if (sidebar) sidebar.style.display = 'none';
-        };
-    </script>
 </body>
 </html>
