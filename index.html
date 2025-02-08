@@ -18,19 +18,10 @@
             padding: 20px;
             text-align: center;
         }
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background-color: #6200ea;
-            color: white;
+        iframe {
+            width: 100%;
+            height: 80vh;
+            border: none;
         }
         footer {
             background-color: #333;
@@ -48,70 +39,28 @@
         <h1>Finora - Kripto Madencilik Verileri</h1>
     </header>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Kripto Para</th>
-                <th>Fiyat (USD)</th>
-                <th>Hashrate</th>
-                <th>Madencilik Havuzu</th>
-            </tr>
-        </thead>
-        <tbody id="dataTable">
-            <!-- Veriler buraya dinamik olarak eklenecek -->
-        </tbody>
-    </table>
+    <iframe id="miningIframe" src="https://miningpoolstats.stream/" title="MiningPoolStats Verileri"></iframe>
 
     <footer>
         <p>© 2023 Finora. Tüm hakları saklıdır.</p>
     </footer>
 
     <script>
-        // CORS Proxy URL'si
-        const corsProxy = "https://corsproxy.io/?";
-        const apiUrl = `https://data.miningpoolstats.stream/data/coins_data.js?t=${Date.now()}`;
+        // Iframe yüklendiğinde çalışacak fonksiyon
+        document.getElementById('miningIframe').onload = function() {
+            const iframe = document.getElementById('miningIframe');
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
 
-        // Verileri çekme ve tabloya ekleme fonksiyonu
-        async function fetchData() {
-            try {
-                const response = await fetch(corsProxy + apiUrl);
-                const textData = await response.text(); // Veriyi metin olarak al
+            // Iframe içeriğini manipüle et
+            const header = iframeDocument.querySelector('header');
+            const footer = iframeDocument.querySelector('footer');
+            const sidebar = iframeDocument.querySelector('.sidebar');
 
-                // Eğer veri JSONP formatındaysa, callback fonksiyonunu kullan
-                if (textData.startsWith("callback(")) {
-                    const jsonpData = textData.replace("callback(", "").slice(0, -1);
-                    const data = JSON.parse(jsonpData); // JSON'a dönüştür
-                    renderTable(data);
-                } else {
-                    const data = JSON.parse(textData); // JSON'a dönüştür
-                    renderTable(data);
-                }
-            } catch (error) {
-                console.error("Veri çekme hatası:", error);
-                document.getElementById("dataTable").innerHTML = `<tr><td colspan="4">Veriler yüklenirken bir hata oluştu.</td></tr>`;
-            }
-        }
-
-        // Tabloya veri ekleme fonksiyonu
-        function renderTable(data) {
-            const tableBody = document.getElementById("dataTable");
-            let tableContent = '';
-
-            data.forEach(item => {
-                tableContent += `<tr>
-                                    <td>${item.name}</td>
-                                    <td>${item.price}</td>
-                                    <td>${item.hashrate}</td>
-                                    <td>${item.pool}</td>
-                                 </tr>`;
-            });
-
-            tableBody.innerHTML = tableContent;
-        }
-
-        // Sayfa yüklendiğinde ve her 5 dakikada bir verileri güncelle
-        fetchData();
-        setInterval(fetchData, 300000); // 5 dakikada bir güncelle
+            // İstenmeyen kısımları gizle
+            if (header) header.style.display = 'none';
+            if (footer) footer.style.display = 'none';
+            if (sidebar) sidebar.style.display = 'none';
+        };
     </script>
 </body>
 </html>
