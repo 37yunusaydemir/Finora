@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finora - Tüm Kripto Paralar</title>
+    <title>Finora - Kripto Madencilik Verileri</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -45,7 +45,7 @@
 </head>
 <body>
     <header>
-        <h1>Finora - Tüm Kripto Paralar</h1>
+        <h1>Finora - Kripto Madencilik Verileri</h1>
     </header>
 
     <table>
@@ -67,8 +67,9 @@
     </footer>
 
     <script>
-        // API URL'si (MiningPoolStats.stream'in kullandığı API)
-        const apiUrl = "https://data.miningpoolstats.stream/data/coins_data.js?";
+        // API URL'si (t parametresi dinamik olarak oluşturuluyor)
+        const timestamp = Date.now();
+        const apiUrl = `https://data.miningpoolstats.stream/data/coins_data.js?t=${timestamp}`;
 
         // Verileri çekme ve tabloya ekleme fonksiyonu
         async function fetchData() {
